@@ -313,7 +313,7 @@ The results from both methods will be compared based on:
 #### 6.1.3 Confusion Matrix (Training Set)
 
 **Table 1: Confusion Matrix for Method 1 (Training Set)**
-*This confusion matrix shows the classification results on the training set using the best OOB model. Rows represent true labels, columns represent predicted labels.*
+*This confusion matrix shows the classification results on the training set using the best OOB model. Parameters: n_estimators=300, max_features=0.3, max_depth=20, min_samples_split=5, min_samples_leaf=1, class_weight='balanced', OOB=True. Rows represent true labels, columns represent predicted labels. Values are raw counts, not percentages.*
 
 | | Predicted: 0 | Predicted: 1 |
 |---|---|---|
@@ -329,7 +329,7 @@ The results from both methods will be compared based on:
 *Figure 4: Code snippet for computing all accuracy measures including accuracy, precision, recall, F1 score, and confusion matrix from the best OOB model.*
 
 **Table 2: Method 1 Accuracy Measures**
-*All accuracy measures computed from the best OOB model on the training set. All values shown to 5 decimal places.*
+*All accuracy measures computed from the best OOB model on the training set. Parameters: n_estimators=300, max_features=0.3, max_depth=20, min_samples_split=5, min_samples_leaf=1, class_weight='balanced', OOB=True. All values shown to 5 decimal places.*
 
 | Metric | Value |
 |--------|-------|
@@ -354,6 +354,8 @@ The results from both methods will be compared based on:
 | Recall | 0.97143 |
 | F1 Score | 0.97143 |
 
+*Note: All metrics shown to 5 decimal places. Parameters: n_estimators=300, max_features=0.3, max_depth=20, min_samples_split=5, min_samples_leaf=1, class_weight='balanced'.*
+
 **Confusion Matrix:**
 | | Predicted: 0 | Predicted: 1 |
 |---|---|---|
@@ -373,7 +375,11 @@ The results from both methods will be compared based on:
 | Recall | 0.90909 |
 | F1 Score | 0.95238 |
 
+*Note: All metrics shown to 5 decimal places. Parameters: n_estimators=300, max_features=0.3, max_depth=20, min_samples_split=5, min_samples_leaf=1, class_weight='balanced'.*
+
 **Confusion Matrix:**
+*Fold 2 confusion matrix. Parameters: n_estimators=300, max_features=0.3, max_depth=20, min_samples_split=5, min_samples_leaf=1, class_weight='balanced'. Values are raw counts, not percentages.*
+
 | | Predicted: 0 | Predicted: 1 |
 |---|---|---|
 | **True: 0** | 267 | 0 |
@@ -392,7 +398,11 @@ The results from both methods will be compared based on:
 | Recall | 0.87500 |
 | F1 Score | 0.93333 |
 
+*Note: All metrics shown to 5 decimal places. Parameters: n_estimators=300, max_features=0.3, max_depth=20, min_samples_split=5, min_samples_leaf=1, class_weight='balanced'.*
+
 **Confusion Matrix:**
+*Fold 3 confusion matrix. Parameters: n_estimators=300, max_features=0.3, max_depth=20, min_samples_split=5, min_samples_leaf=1, class_weight='balanced'. Values are raw counts, not percentages.*
+
 | | Predicted: 0 | Predicted: 1 |
 |---|---|---|
 | **True: 0** | 259 | 0 |
@@ -414,12 +424,19 @@ The results from both methods will be compared based on:
 *[Screenshot of code from hw2_rf_pipeline.py, lines 236-305]*
 
 ![Method 2 CV Code](screenshots/method2_cv_code.png)
-*Figure 5: Code snippet for Method 2 - Manual 3-fold cross-validation implementation. Shows manual fold splitting, training, prediction, and metric computation for each fold.*
+*Figure 5: Code snippet for Method 2 - Manual 3-fold cross-validation implementation. Shows manual fold splitting (NOT using sklearn's cross_val_score or KFold), explicit for loop iterating through each fold, manual training on combined folds, and metric computation for each fold. The code clearly shows: Fold 1 trains on folds [2,3] and tests on fold [1]; Fold 2 trains on folds [1,3] and tests on fold [2]; Fold 3 trains on folds [1,2] and tests on fold [3].*
+
+**Manual CV Implementation Details:**
+- **Fold 1:** Created by taking rows 0-289 (289 samples) → Used as Test Set; Trained on rows 290-868 (580 samples)
+- **Fold 2:** Created by taking rows 290-578 (289 samples) → Used as Test Set; Trained on rows 0-289 and 579-868 (580 samples)
+- **Fold 3:** Created by taking rows 579-868 (291 samples) → Used as Test Set; Trained on rows 0-578 (578 samples)
+
+This manual implementation ensures no ready-made CV methods are used, as required by the assignment instructions.
 
 ### 6.3 Comparison of Method 1 and Method 2
 
 **Table 4: Comparison of Method 1 (OOB) and Method 2 (3-Fold CV)**
-*Comparison of accuracy measures from both methods. All values shown to 5 decimal places.*
+*Comparison of accuracy measures from both methods. Method 1 parameters: n_estimators=300, max_features=0.3, max_depth=20, min_samples_split=5, min_samples_leaf=1, class_weight='balanced', OOB=True. Method 2 parameters: Same as Method 1, manual 3-fold CV. All values shown to 5 decimal places.*
 
 | Metric | Method 1 (OOB) | Method 2 (CV) | Difference |
 |--------|----------------|--------------|------------|
@@ -472,7 +489,7 @@ Feature ranking was performed using the **Gini importance** method (default in s
 ### 7.3 Top 10 Ranked Features
 
 **Table 5: Top 10 Features by Gini Importance**
-*Features ranked by Gini importance from the best trained Random Forest model (Method 1). Importance values represent the total decrease in node impurity weighted by probability of reaching that node, averaged over all trees.*
+*Features ranked by Gini importance from the best trained Random Forest model (Method 1). Model parameters: n_estimators=300, max_features=0.3, max_depth=20, min_samples_split=5, min_samples_leaf=1, class_weight='balanced'. Importance values represent the total decrease in node impurity (Gini) weighted by probability of reaching that node, averaged over all 300 trees in the forest.*
 
 | Rank | Feature Name | Importance Value |
 |------|---------------|-----------------|
@@ -607,7 +624,7 @@ The runtime engine was created using the best trained Random Forest model from M
 ### 8.3 Verification Database Predictions
 
 **Table 6: Runtime Prediction Results on Verification Database**
-*Predictions made by the best trained Random Forest model (Method 1) on the 2 verification samples. Probabilities shown to 5 decimal places.*
+*Predictions made by the best trained Random Forest model (Method 1) on the 2 verification samples. Model parameters: n_estimators=300, max_features=0.3, max_depth=20, min_samples_split=5, min_samples_leaf=1, class_weight='balanced'. Probabilities represent the proportion of trees voting for each class. All values shown to 5 decimal places.*
 
 | Sample | True Label | Predicted Label | Prob(Class 0) | Prob(Class 1) | Correct? |
 |--------|------------|-----------------|---------------|---------------|----------|
