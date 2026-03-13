@@ -3,8 +3,8 @@
 
 **Class:** CSC 659/859  
 **Semester:** Spring 2026  
-**Date:** 3-12-26  
-**Name:** Nathaniel Moreno  
+**Date:** [Insert Current Date]  
+**Name:** Nathaniel (Nate) Moreno  
 **Email:** nmoreno@sfsu.edu
 
 ---
@@ -14,8 +14,8 @@
 **HW 2 Title:** ML Pipeline Experiment with Random Forest for i1 Cluster Classification  
 **Class:** CSC 659/859  
 **Semester:** Spring 2026  
-**Date:** 3-12-26  
-**Name:** Nathaniel Moreno  
+**Date:** [Insert Current Date]  
+**Name:** Nathaniel (Nate) Moreno  
 **Email:** nmoreno@sfsu.edu
 
 ---
@@ -107,7 +107,15 @@ All features are numerical (continuous) representing gene expression levels. No 
 - **Number of samples:** 871
 - **Number of features:** 608
 - **Ratio:** 1.43:1 (871/608 = 1.43)
-- **Requirement met (≥10:1):** No - The ratio of 1.43:1 does not meet the requirement of at least 10:1. This is a limitation of the dataset that should be noted. However, Random Forest can still work with this ratio, though it may be more prone to overfitting. The use of regularization parameters (max_depth, min_samples_split, etc.) helps mitigate this concern.
+- **Requirement met (≥10:1):** **No** - The ratio of 1.43:1 does NOT meet the requirement of at least 10:1 (which would require at least 6,080 samples). 
+
+**Critical Analysis:** The number of features (608) exceeds what would typically be recommended given the sample size. This is a significant limitation of the dataset. However, Random Forest is particularly well-suited for this high-dimensional scenario because:
+1. Random Forest naturally handles high-dimensional data through feature subsampling (max_features parameter)
+2. The ensemble approach with multiple trees helps reduce overfitting
+3. Regularization parameters (max_depth=20, min_samples_split=5, min_samples_leaf=1) are used to prevent overfitting
+4. The OOB score provides internal validation without needing a separate validation set
+
+This limitation should be acknowledged, but Random Forest's inherent properties make it an appropriate choice for this dataset despite the unfavorable sample-to-feature ratio.
 
 #### 2.2.8 Privacy Issues
 [Not applicable - no personally identifiable information in gene expression data]
@@ -235,20 +243,26 @@ Where:
 The final CV accuracy is the average of the three fold accuracies.
 
 #### 5.2.2 Implementation Steps
-The CV was implemented manually (not using sklearn's built-in CV methods) in the following steps:
+The CV was implemented **manually** (NOT using sklearn's built-in CV methods like `cross_val_score`, `KFold`, or `cross_validate`) in the following steps:
 
 1. **Shuffle the training data indices** (random seed: 42)
-2. **Split indices into 3 folds:**
-   - Fold 1: Indices [0:fold_size]
-   - Fold 2: Indices [fold_size:2*fold_size]
-   - Fold 3: Indices [2*fold_size:]
-3. **For each fold:**
-   - Use the fold as test set
-   - Combine remaining folds as training set
-   - Train Random Forest model
-   - Predict on test set
-   - Compute accuracy, precision, recall, F1 score, and confusion matrix
+2. **Split indices into 3 folds manually:**
+   - Fold 1: Indices [0:fold_size] → Used as Test Set
+   - Fold 2: Indices [fold_size:2*fold_size] → Used as Test Set
+   - Fold 3: Indices [2*fold_size:] → Used as Test Set
+3. **For each fold (manually loop through):**
+   - **Fold 1:** Train on Folds [2,3], Test on Fold [1]
+   - **Fold 2:** Train on Folds [1,3], Test on Fold [2]
+   - **Fold 3:** Train on Folds [1,2], Test on Fold [3]
+   - For each fold:
+     - Split data into train/test using the fold indices
+     - **Report the number of Class 0 and Class 1 samples in each train/test partition**
+     - Train Random Forest model on training partition
+     - Predict on test partition
+     - Compute accuracy, precision, recall, F1 score, and confusion matrix
 4. **Compute average metrics** across all 3 folds
+
+**Important:** This implementation does NOT use any ready-made CV methods. Each fold is explicitly split and processed manually in a loop.
 
 #### 5.2.3 Software Methods/Classes Used
 - Manual fold splitting using numpy array indexing
@@ -635,7 +649,13 @@ For each sample, discuss:
 - **Interpretation:** The model is extremely confident (96.33%) that this sample belongs to the i1 cluster class. The very low probability of 0.03667 for class 0 indicates an almost certain classification as i1 cluster. This is a very high-confidence prediction, significantly above the 0.8 threshold, suggesting the model has strong evidence (likely high expression of COL5A2, NDNF, and/or FAT1 genes) for this classification.
 
 **Overall Confidence Assessment:**
-Both predictions show high to very high confidence levels (83.33% and 96.33%), well above the 0.6 threshold for acceptable confidence. The confidence is determined by taking the maximum probability between the two classes. The fact that both samples were correctly classified with high confidence suggests the model is not only accurate but also reliable in its predictions. The higher confidence for Sample 2 (i1 cluster) may reflect the model's strong reliance on the ground truth genes (COL5A2, NDNF, FAT1) which are highly expressed in i1 cluster samples.
+Both predictions show high to very high confidence levels (83.33% and 96.33%), well above the 0.6 threshold for acceptable confidence. The confidence is determined by taking the maximum probability between the two classes, which represents the proportion of trees in the Random Forest ensemble that voted for that class. 
+
+For Sample 1: The probability of 0.83333 for class 0 means that approximately 83.33% of the 300 trees in the ensemble voted for class 0 (non-i1), indicating strong agreement among trees.
+
+For Sample 2: The probability of 0.96333 for class 1 means that approximately 96.33% of the 300 trees voted for class 1 (i1 cluster), indicating very strong agreement. This high confidence suggests the model has strong evidence (likely high expression of COL5A2, NDNF, and/or FAT1 genes) for this classification.
+
+The fact that both samples were correctly classified with high confidence suggests the model is not only accurate but also reliable in its predictions, with the majority of trees agreeing on the classification.
 
 ---
 
@@ -715,8 +735,22 @@ GenAI (Cursor AI Assistant) was used as a coding assistant and tutor throughout 
   - Confidence assessment for runtime predictions
 - **Usefulness Rating:** 5 (Very useful) - Significantly reduced time needed for report writing while ensuring comprehensive coverage of all requirements.
 
+### Task 5: Final Review and Critical Requirements Check
+- **GenAI Tool Used:** Google Gemini
+- **How it helped:** Reviewed the draft report template against Professor Petkovic's strict requirements and identified critical areas that needed attention, including sample-to-feature ratio discussion, manual CV verification, 5-decimal formatting, and submission requirements.
+- **Example Prompts:**
+  ```
+  "I have reviewed your draft template against Professor Petkovic's strict requirements..."
+  ```
+- **Key GenAI Output:**
+  - Checklist of critical technical details to verify
+  - Specific requirements for manual CV implementation
+  - File naming and submission format requirements
+  - Reminders about 5-decimal precision and confusion matrix formatting
+- **Usefulness Rating:** 5 (Very useful) - Provided critical quality assurance review that helped ensure all assignment requirements would be met for full points.
+
 **Overall Assessment:**
-GenAI was used primarily as a coding assistant and tutor, helping to structure the solution, understand requirements, and generate well-documented code. All code and analysis were reviewed and verified for accuracy. The GenAI assistant was particularly valuable for ensuring all assignment requirements were met and for generating comprehensive documentation and analysis.
+GenAI was used primarily as a coding assistant and tutor, helping to structure the solution, understand requirements, and generate well-documented code. All code and analysis were reviewed and verified for accuracy. The GenAI assistants (Cursor AI and Google Gemini) were particularly valuable for ensuring all assignment requirements were met and for generating comprehensive documentation and analysis.
 
 ---
 
@@ -739,5 +773,27 @@ The complete code is provided in the file `hw2_rf_pipeline.py`. For submission, 
 
 The code is well-documented with comments explaining the purpose of each section, key parameters, and methodology. All random seeds are set to 42 for reproducibility.
 
-**Note:** For the PDF submission, the code from `hw2_rf_pipeline.py` should be copied and formatted appropriately in the PDF document.
+**Note:** For the PDF submission, the code from `hw2_rf_pipeline.py` should be copied and formatted appropriately in the PDF document. The code header includes: "Author: Nathaniel (Nate) Moreno" as required.
+
+---
+
+## Submission Checklist
+
+Before submitting, verify the following:
+
+- [ ] **File Name:** `CSC 659-859 Spring 2026 HW 2 Moreno.PDF` (exact format with spaces and capitalization)
+- [ ] **Email To:** Petkovic@sfsu.edu
+- [ ] **Email Subject:** `CS 659 859 Spring 2026 HW 2 Moreno` (Note: "CS" not "CSC", no dashes in subject)
+- [ ] **Email Body:** Includes courtesy text
+- [ ] **Title Page:** Name is "Nathaniel (Nate) Moreno" (not just "Nathaniel Moreno")
+- [ ] **All Sections:** Complete with all required information
+- [ ] **Code Header:** Appendix II code has header with "Author: Nathaniel (Nate) Moreno"
+- [ ] **5 Decimal Places:** All accuracy measures formatted to exactly 5 decimal places
+- [ ] **Confusion Matrices:** Show full counts (not percentages), axes labeled
+- [ ] **Manual CV:** Clearly stated that CV was done manually (not using sklearn's built-in methods)
+- [ ] **Sample-to-Feature Ratio:** Explicitly discussed as a limitation (1.43:1 does not meet 10:1 requirement)
+- [ ] **Ground Truth Comparison:** COL5A2, NDNF, FAT1 discussed in feature ranking section
+- [ ] **Runtime Probabilities:** Both verification samples show class probabilities
+- [ ] **Appendix I:** GenAI usage documented with prompts and usefulness ratings
+- [ ] **Appendix II:** Full code included in PDF format
 

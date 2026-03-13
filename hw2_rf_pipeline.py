@@ -1,8 +1,8 @@
 """
 CSC 659/859 Spring 2026 - HW 2
 Random Forest ML Pipeline for i1 Cluster Classification
-Author: [Your Name]
-Date: [Date]
+Author: Nathaniel (Nate) Moreno
+Date: [Insert Date]
 
 Purpose:
 This script implements a complete Random Forest pipeline for classifying i1 nerve cluster
