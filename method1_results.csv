@@ -1,0 +1,2 @@
+Method,OOB_Accuracy,Training_Accuracy,Precision,Recall,F1_Score,n_estimators,max_features,max_depth,min_samples_split,min_samples_leaf,class_weight
+OOB,0.9930955120828538,1.0,1.0,1.0,1.0,300,0.3,20,5,1,balanced
