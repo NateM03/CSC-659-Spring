@@ -357,6 +357,8 @@ The results from both methods will be compared based on:
 *Note: All metrics shown to 5 decimal places. Parameters: n_estimators=300, max_features=0.3, max_depth=20, min_samples_split=5, min_samples_leaf=1, class_weight='balanced'.*
 
 **Confusion Matrix:**
+*Fold 1 confusion matrix. Parameters: n_estimators=300, max_features=0.3, max_depth=20, min_samples_split=5, min_samples_leaf=1, class_weight='balanced'. Values are raw counts, not percentages.*
+
 | | Predicted: 0 | Predicted: 1 |
 |---|---|---|
 | **True: 0** | 253 | 1 |
